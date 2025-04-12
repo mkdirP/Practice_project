@@ -1,6 +1,8 @@
 package com.example.controller;
 
 import com.example.tools.ValidationMessage;
+import com.example.tools.ValidationResponse;
+import com.example.tools.ValidationStats;
 import org.apache.poi.xwpf.usermodel.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,10 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/validate")
@@ -23,10 +22,12 @@ public class TemplateValidatorController {
     // private static final List<String> REQUIRED_SECTIONS = List.of("Введение", "Заключение", "Список литературы");
 
     @PostMapping
-    public ResponseEntity<List<ValidationMessage>> validateTemplate(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<ValidationResponse> validateTemplate(@RequestParam("file") MultipartFile file) {
         List<ValidationMessage> result = new ArrayList<>();
         Set<String> checkedParagraphs = new HashSet<>();  // 用于保存已经检查过的段落内容
         Set<String> checkedFontSizeErrors = new HashSet<>();  // 用于保存字号不正确错误的去重
+        Map<String, Long> errorCountMap = new HashMap<>();
+        int totalParagraphs = 0;
 
         try (XWPFDocument doc = new XWPFDocument(file.getInputStream())) {
             // 遍历文档的每个段落
@@ -37,13 +38,13 @@ public class TemplateValidatorController {
                 if (paragraphText.isEmpty()) {
                     continue;
                 }
-
                 // 检查该段落是否已经被检查过
                 if (checkedParagraphs.contains(paragraphText)) {
                     continue;  // 如果已经检查过，跳过该段落
                 }
 
                 checkedParagraphs.add(paragraphText);  // 将段落文本添加到已检查集合
+                totalParagraphs++;
 
                 // 验证字体和字号
                 for (XWPFRun run : paragraph.getRuns()) {
@@ -58,6 +59,7 @@ public class TemplateValidatorController {
                                 "请将字体设置为 Times New Roman",
                                 paragraphText
                         ));
+                        errorCountMap.merge("FontMismatch", 1L, Long::sum);
                     }
 
                     // 字号校验
@@ -71,6 +73,7 @@ public class TemplateValidatorController {
                                     "请将字号设置为 14",
                                     paragraphText
                             ));
+                            errorCountMap.merge("FontSizeMismatch", 1L, Long::sum);
                             checkedFontSizeErrors.add(errorKey);  // 将这个错误标记为已记录
                         }
                     }
@@ -85,6 +88,7 @@ public class TemplateValidatorController {
                             "请将段落对齐方式设置为左对齐",
                             paragraphText
                     ));
+                    errorCountMap.merge("AlignmentError", 1L, Long::sum);
                 }
             }
 
@@ -92,7 +96,13 @@ public class TemplateValidatorController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
 
-        return ResponseEntity.ok(result);
+        // 构建统计结果
+        ValidationStats stats = new ValidationStats();
+        stats.setErrorTypeCount(errorCountMap);
+        stats.setTotalParagraphs(totalParagraphs);
+        stats.setTotalErrors(result.size());
+
+        return ResponseEntity.ok(new ValidationResponse(result, stats));
     }
 
 
