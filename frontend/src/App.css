@@ -1,0 +1,35 @@
+/* App.css */
+.container {
+  width: 80%;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f4f4f4;
+  border-radius: 8px;
+}
+
+.upload-section {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.loading-indicator {
+  text-align: center;
+}
+
+.results-section {
+  margin-top: 30px;
+}
+
+.download-section {
+  margin-top: 20px;
+  text-align: center;
+}
+
+button {
+  width: 200px;
+  margin: 0 auto;
+}
+
+table {
+  margin-top: 20px;
+}

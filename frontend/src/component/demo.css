@@ -1,0 +1,117 @@
+/* App.css */
+.container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.upload-error {
+    margin-top: 10px;
+    text-align: center;
+    font-size: 14px;
+    color: #ff4d4f;
+}
+
+.page-title {
+    text-align: center;
+    font-size: 28px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.upload-section {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.upload-btn {
+    background-color: #1890ff;
+    color: #fff;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+/* App.css */
+
+.file-info {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.file-info-inner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #fafafa;
+    padding: 10px 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.file-name {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+
+.delete-btn {
+    margin-left: 10px;
+    color: #ff4d4f;
+}
+
+.loading-indicator {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.progress-bar {
+    margin-top: 10px;
+}
+
+.results-section {
+    margin-top: 40px;
+}
+
+.results-table {
+    margin-top: 20px;
+    background-color: #fff;
+}
+
+.download-section {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.download-btn {
+    background-color: #52c41a;
+    color: #fff;
+    font-size: 16px;
+    border-radius: 5px;
+}
+
+.error-font-size {
+    background-color: #ffcccc; /* 红色背景 */
+}
+
+.error-alignment {
+    background-color: #ffeb99; /* 黄色背景 */
+}
+
+@media (max-width: 768px) {
+    .container {
+        width: 90%;
+    }
+    .page-title {
+        font-size: 24px;
+    }
+    .upload-btn {
+        width: 100%;
+    }
+    .results-section {
+        margin-top: 20px;
+    }
+}
