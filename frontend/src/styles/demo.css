@@ -1,6 +1,6 @@
 /* App.css */
 .container {
-    width: 80%;
+    width: 95%;
     margin: 0 auto;
     padding: 20px;
     background-color: #f4f4f4;
@@ -94,12 +94,39 @@
 }
 
 .error-font-size {
-    background-color: #ffcccc; /* 红色背景 */
+    background-color: #ffcccc;
 }
 
 .error-alignment {
-    background-color: #ffeb99; /* 黄色背景 */
+    background-color: #ffeb99;
 }
+.error-centerAlignment {
+    background-color: lightyellow;
+}
+
+.error-contentMismatch{
+    background-color: lightgray;
+}
+
+.error-boldError {
+    background-color: lightcyan;
+}
+
+.error-missingTOC {
+    background-color: lightgreen;
+}
+.error-TOCNotOnNewPageBefore{
+    background-color: #D0FFD9
+}
+.error-TOCNotOnNewPageAfter{
+    background-color: #98F7AA
+}
+
+.error-missingSection {
+    background-color: #AAC7FC;
+}
+
+
 
 @media (max-width: 768px) {
     .container {

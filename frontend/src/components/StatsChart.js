@@ -9,7 +9,7 @@ const StatsChart = ({ stats }) => {
 
     return (
         <div className="stats-section">
-            <h3>错误类型统计</h3>
+            <h3>Статистика типов ошибок</h3>
             <ResponsiveContainer width="100%" height={300}>
                 <BarChart
                     data={data}

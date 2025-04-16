@@ -18,16 +18,28 @@ const App = () => {
     const handleUpload = async (file) => {
         setLoading(true);
         setUploadProgress(0);
+
         try {
             const data = await handleUploadFile(file, setUploadProgress);
-            setValidationResult(data.messages);
-            setStats(data.stats.errorTypeCount);
+
+            // 检查 data 是否存在并且包含 messages 和 stats
+            if (data && data.messages && data.stats) {
+                setValidationResult(data.messages);
+                setStats(data.stats.errorTypeCount);
+            } else {
+                // 如果没有返回有效的 messages 或 stats
+                message.error('返回的数据格式不正确');
+            }
+
+            setUploadProgress(100);
         } catch (err) {
-            message.error('上传失败，请重试');
+            console.error(err);
+            message.error('Загрузка не удалась, попробуйте еще раз');
         } finally {
             setLoading(false);
         }
     };
+
 
     const handleRemoveFile = () => {
         setFileList([]);
@@ -38,7 +50,7 @@ const App = () => {
 
     return (
         <div className="container">
-            <h1 className="page-title">自动检查模板</h1>
+            <h1 className="page-title">Авторизация проверки шаблона ВКР</h1>
 
             <FileUploader
                 fileList={fileList}
@@ -65,7 +77,7 @@ const App = () => {
                             className="download-btn"
                             onClick={() => generatePDFReport(validationResult)}
                         >
-                            下载PDF报告
+                            Загрузить отчет в формате PDF
                         </Button>
                     </div>
                 </>

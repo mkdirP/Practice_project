@@ -15,16 +15,17 @@ const FileUploader = ({
 
     const beforeUpload = (file) => {
         const isWord = file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-        const isPdf = file.type === 'application/pdf';
+        // const isPdf = file.type === 'application/pdf';
+        const isLatex = file.name.toLowerCase().endsWith('.tex');
         const isLt5M = file.size / 1024 / 1024 < 5;
 
-        if (!isWord && !isPdf) {
-            setUploadError('只能上传Word或PDF文件！');
+        if (!isWord && !isLatex) {
+            setUploadError('Можно загружать только файлы .docx или .tex!');
             return false;
         }
 
         if (!isLt5M) {
-            setUploadError('文件大小必须小于 5MB！');
+            setUploadError('Размер файла должен быть менее 5 МБ!');
             return false;
         }
 
@@ -45,7 +46,7 @@ const FileUploader = ({
                 fileList={fileList}
             >
                 <Button icon={<UploadOutlined />} size="large" className="upload-btn">
-                    点击上传ВКР模板
+                    Нажмите, чтобы загрузить шаблон ВКР
                 </Button>
             </Upload>
 
@@ -60,7 +61,6 @@ const FileUploader = ({
                             onClick={onRemove}
                             className="delete-btn"
                         >
-                            删除文件
                         </Button>
                     </div>
                 </div>

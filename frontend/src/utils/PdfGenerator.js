@@ -9,12 +9,12 @@ export const generatePDFReport = (validationResult) => {
     doc.setFontSize(12);
     doc.text("Отчет о проверке шаблона ВКР", 20, 20);
 
-    const headers = ["错误类型", "错误信息", "建议", "错误上下文"];
+    const headers = ["Тип ошибки", "Сообщение об ошибке", "Предложение", "Контекст ошибки"];
     const tableData = validationResult.map((item) => [
-        item.type,
+        item.code,
         item.message,
         item.suggestion,
-        item.context,
+        item.content,
     ]);
 
     autoTable(doc, {

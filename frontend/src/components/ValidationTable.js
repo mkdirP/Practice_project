@@ -4,20 +4,20 @@ import { Table } from 'antd';
 const ValidationTable = ({ data }) => {
     const columns = [
         {
-            title: '错误类型',
-            dataIndex: 'type',
+            title: 'Тип ошибки',
+            dataIndex: 'code',
         },
         {
-            title: '错误信息',
+            title: 'Сообщение об ошибке',
             dataIndex: 'message',
         },
         {
-            title: '建议',
+            title: 'Предложение',
             dataIndex: 'suggestion',
         },
         {
-            title: '错误上下文',
-            dataIndex: 'context',
+            title: 'Контекст ошибки',
+            dataIndex: 'content',
             ellipsis: true,
             render: (text) => (
                 <div style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -28,8 +28,15 @@ const ValidationTable = ({ data }) => {
     ];
 
     const getRowClassName = (record) => {
-        if (record.type === 'FontSizeMismatch') return 'error-font-size';
-        if (record.type === 'AlignmentError') return 'error-alignment';
+        if (record.code === 'FontSizeMismatch') return 'error-font-size';
+        if (record.code === 'AlignmentError') return 'error-alignment';
+        if (record.code === 'CenterAlignmentError') return 'error-centerAlignment';
+        if (record.code === 'ContentMismatch') return 'error-contentMismatch';
+        if (record.code === 'BoldError') return 'error-boldError';
+        if (record.code === 'MissingTOC') return 'error-missingTOC';
+        if (record.code === 'MissingSection') return 'error-missingSection';
+        if (record.code === 'TOCNotOnNewPageBefore') return 'error-TOCNotOnNewPageBefore';
+        if (record.code === 'TOCNotOnNewPageAfter') return 'error-TOCNotOnNewPageAfter';
         return '';
     };
 
