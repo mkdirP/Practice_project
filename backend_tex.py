@@ -50,7 +50,6 @@ def remove_comments(tex_str):
 
 
 def validate_tex(tex_str):
-    print(tex_str)
     result = []
     stats = ValidationStats()
 
@@ -90,8 +89,8 @@ def validate_tex(tex_str):
     if not re.search(r'\\tableofcontents', tex_str, re.MULTILINE):
         result.append(ValidationMessage(
             "MissingTOC",
-            "未找到有效的目录命令 '\\tableofcontents'",
-            "请确保在文档中包含 '\\tableofcontents' 来生成目录。",
+            "Не найдено допустимой команды каталога. '\\tableofcontents'",
+            "Обязательно включите \\tableofcontents в документ, чтобы создать оглавление.",
             ""
         ))
         stats.error_type_count["MissingTOC"] += 1
@@ -103,18 +102,18 @@ def validate_tex(tex_str):
         if not re.search(r'(\\end{titlepage}|\\(newpage|clearpage))', tex_str[:toc_position]):
             result.append(ValidationMessage(
                 "TOCNotOnNewPageBefore",
-                "目录前未找到有效的分页命令",
-                "请确保在 \\tableofcontents 前使用 \\newpage 或 \\clearpage 来将目录放置在单独的一页",
+                "Перед каталогом не найдено допустимой команды подкачки",
+                "Обязательно используйте \\newpage или \\clearpage перед \\tableofcontents, чтобы поместить оглавление на отдельную страницу.",
                 "Перед полям \\tableofcontents"
             ))
             stats.error_type_count["TOCNotOnNewPageBefore"] += 1
 
-        toc_end_position = toc_match.end()  # 获取 \tableofcontents 结束位置
-        if not re.search(r'\\(newpage|clearpage)\s*', tex_str[toc_end_position:]):
+        after_toc = tex_str[toc_position:]
+        if not re.match(r'\\(newpage|clearpage)\s*', after_toc.strip()):
             result.append(ValidationMessage(
                 "TOCNotOnNewPageAfter",
-                "目录后未放置分页命令",
-                "请确保在 \\tableofcontents 后使用 \\newpage 或 \\clearpage 来将目录放置在单独的一页。",
+                "После каталога не ставится команда разбиения на страницы",
+                "Обязательно используйте \\newpage или \\clearpage после \\tableofcontents, чтобы разместить оглавление на отдельной странице.",
                 "После поля \\tableofcontents"
             ))
             stats.error_type_count["TOCNotOnNewPageAfter"] += 1
@@ -124,9 +123,9 @@ def validate_tex(tex_str):
             not re.search(r'\\usepackage(\[.*?\])?\{times\}', tex_str):
         result.append(ValidationMessage(
             "FontMismatch",
-            "未设置 Times New Roman 字体",
-            "建议使用 \\setmainfont{Times New Roman} 或 \\usepackage{times}",
-            "\\setmainfont或\\usepackage 设置段"
+            "Шрифт Times New Roman не установлен",
+            "Рекомендуется использовать \\setmainfont{Times New Roman} или \\usepackage{times}",
+            "Раздел настроек \\setmainfont или \\usepackage"
         ))
         stats.error_type_count["FontMismatch"] += 1
 
@@ -137,9 +136,9 @@ def validate_tex(tex_str):
         if '14pt' not in options:
             result.append(ValidationMessage(
                 "FontSizeMismatch",
-                f"未设置字号为 14pt，当前设置为：{options}",
-                "请设置 documentclass 为 \\documentclass[14pt]{...}",
-                "\\documentclass 设置段"
+                f"Размер шрифта не установлен на 14pt, а на данный момент установлен на:{options}",
+                "Пожалуйста, установите \\documentclass[14pt]{...}",
+                "Раздел настроек \\documentclass"
             ))
             stats.error_type_count["FontSizeMismatch"] += 1
 
@@ -147,9 +146,9 @@ def validate_tex(tex_str):
     if not re.search(r'\\usepackage\[[^\]]*a4paper[^\]]*\]\{geometry\}', tex_str):
         result.append(ValidationMessage(
             "PageSizeMismatch",
-            "页面尺寸不是 A4",
-            "请在文档中设置 A4 页面尺寸，例如使用 \\usepackage[a4paper]{geometry}",
-            "\\usepackage[a4paper]{geometry} 设置段"
+            "Размер страницы не А4",
+            "Пожалуйста, установите размер страницы А4 в вашем документе, например, используя \\usepackage[a4paper]{geometry}",
+            "Раздел настроек \\usepackage[a4paper]{geometry}"
         ))
         stats.error_type_count["PageSizeMismatch"] += 1
 
@@ -158,9 +157,9 @@ def validate_tex(tex_str):
             not re.search(r'\\begin\{flushleft\}', tex_str):
         result.append(ValidationMessage(
             "AlignmentError",
-            "文档可能未设置左对齐",
-            "建议添加 \\raggedright 或使用 \\begin{flushleft} ... \\end{flushleft}",
-            "\\raggedright 或 \\begin{flushleft} ... \\end{flushleft} 设置段"
+            "Документ не может быть выровнен по левому краю.",
+            "Рекомендуется добавить \\raggedright или использовать \\begin{flushleft} ... \\end{flushleft}",
+            "Раздел настроек \\raggedright или \\begin{flushleft} ... \\end{flushleft}"
         ))
         stats.error_type_count["AlignmentError"] += 1
 
@@ -178,8 +177,8 @@ def validate_tex(tex_str):
         if missing_words:
             result.append(ValidationMessage(
                 "AlignmentError",
-                f"{label} 中以下词语未居中对齐：{'，'.join(missing_words)}",  # f"未检测到居中对齐的 {label}",
-                "请确保所有词语在 \\begin{center} ... \\end{center} 中。",
+                f"Следующие слова в '{label}' не центрированы:{'，'.join(missing_words)}",
+                "Убедитесь, что все слова находятся в пределах \\begin{center} ... \\end{center}.",
                 " ".join(words)
             ))
             stats.error_type_count["AlignmentError"] += 1
@@ -192,8 +191,8 @@ def validate_tex(tex_str):
         if expected_text not in tex_str:
             result.append(ValidationMessage(
                 "ContentMismatch",
-                f"未找到规范文本: '{expected_text}'",
-                f"请确保文档中包含以下文本: '{expected_text}'",
+                f"Канонический текст не найден: '{expected_text}'",
+                f"Убедитесь, что в ваш документ включен следующий текст: '{expected_text}'",
                 expected_text
             ))
             stats.error_type_count["ContentMismatch"] += 1
@@ -202,8 +201,8 @@ def validate_tex(tex_str):
             if not re.search(bold_pattern, tex_str):
                 result.append(ValidationMessage(
                     "BoldError",
-                    f"文本未加粗: '{expected_text}'",
-                    f"请确保 '{expected_text}' 使用 \\textbf{{}} 进行加粗",
+                    f"Текст не жирный: '{expected_text}'",
+                    f"Убедитесь, что '{expected_text}' выделен жирным шрифтом с помощью \\textbf{{}}",
                     expected_text
                 ))
                 stats.error_type_count["BoldError"] += 1
@@ -215,8 +214,8 @@ def validate_tex(tex_str):
         if section["phrase"] not in unnumbered_sections:
             result.append(ValidationMessage(
                 "MissingSection",
-                f"缺少标题 '{section['phrase']}'",
-                f"请确保标题 '{section['phrase']}' 出现在文档中。",
+                f"Отсутствует заголовок '{section['phrase']}'",
+                f"Убедитесь, что в документе присутствует заголовок '{section['phrase']}'.",
                 ""
             ))
             stats.error_type_count["MissingSection"] += 1
@@ -224,16 +223,16 @@ def validate_tex(tex_str):
         if not title.isupper():
             result.append(ValidationMessage(
                 "UppercaseTitle",
-                f"标题不是全大写",
-                "无编号标题应使用全大写。",
+                f"Название не полностью написано заглавными буквами",
+                "Ненумерованные заголовки следует писать заглавными буквами.",
                 title
             ))
             stats.error_type_count["UppercaseTitle"] += 1
         if not re.search(r'\\addcontentsline\{toc\}\{section\}\{' + re.escape(title) + r'\}', tex_str):
             result.append(ValidationMessage(
                 "MissingInTOC",
-                f"标题 '{title}' 未在目录中列出",
-                "请确保标题被正确列入目录。",
+                f"Заголовок '{title}' не указан в каталоге",
+                "Пожалуйста, убедитесь, что название указано правильно в содержании.",
                 title
             ))
             stats.error_type_count["MissingInTOC"] += 1
@@ -241,9 +240,9 @@ def validate_tex(tex_str):
     if len(result) == 0:
         result.append(ValidationMessage(
             "NoErrors",
-            "文档符合规范",
-            "没有发现任何格式错误。",
-            ""
+            "Документация соответствует правилам",
+            "Ошибок форматирования не обнаружено.",
+            "ОКЕЙ"
         ))
 
     stats.total_errors = len(result)
@@ -254,7 +253,7 @@ def validate_tex(tex_str):
 def validate_tex_upload():
     file = request.files.get("file")
     if not file or not file.filename.endswith(".tex"):
-        return jsonify({"error": "请上传 .tex 文件"}), 400
+        return jsonify({"error": "Пожалуйста, загрузите файл .tex"}), 400
 
     content = file.read().decode("utf-8")
     content = remove_comments(content)
