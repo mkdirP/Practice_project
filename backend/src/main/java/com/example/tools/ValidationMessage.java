@@ -6,8 +6,8 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class ValidationMessage {
-    public String type;
+    public String code;
     public String message;
     public String suggestion;
-    public String context;
+    public String content;
 }
