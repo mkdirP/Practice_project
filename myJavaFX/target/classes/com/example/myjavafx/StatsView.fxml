@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.chart.PieChart?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.myjavafx.controller.StatsController" spacing="20"
+      style="-fx-padding: 20; -fx-background-color: #ECF0F1;">
+
+    <Label text="错误类型统计" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #34495E; -fx-margin-bottom: 20px;"/>
+
+    <HBox alignment="CENTER" >
+        <PieChart fx:id="pieChart"/>
+    </HBox>
+</VBox>
+
+
+
+
