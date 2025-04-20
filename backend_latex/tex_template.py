@@ -14,30 +14,6 @@ def validate_tex(tex_str):
     stats = ValidationModels.ValidationStats()
     tex_str = remove_comments(tex_str)
 
-    texts_to_check_title = [
-        {"words": ["Министерство", "науки", "и", "высшего", "образования", "Российской", "Федерации"],
-         "label": "Font1"},
-        {"words": ["ФЕДЕРАЛЬНОЕ", "ГОСУДАРСТВЕННОЕ", "АВТОНОМНОЕ", "ОБРАЗОВАТЕЛЬНОЕ", "УЧРЕЖДЕНИЕ", "ВЫСШЕГО",
-                   "ОБРАЗОВАНИЯ"], "label": "Font2"},
-        {"words": ["НАЦИОНАЛЬНЫЙ", "ИССЛЕДОВАТЕЛЬСКИЙ", "УНИВЕРСИТЕТ", "ИТМО", "ITMO", "University"], "label": "Font3"},
-        {"words": ["ВЫПУСКНАЯ", "КВАЛИФИКАЦИОННАЯ", "РАБОТА"], "label": "Title1"},
-        {"words": ["GRADUATION", "THESIS"], "label": "Title2"},
-        {"words": ["Разработка", "интеллектуальной", "системы", "управления", "складом", "для", "организаций", "малого",
-                   "бизнеса"], "label": "Subtitle"}
-    ]
-
-    texts_to_check_bold = [
-        {"expected": "Обучающийся / Student:", "label": "Student"},
-        {"expected": "Факультет / Faculty:", "label": "Faculty"},
-        {"expected": "Группа / Group:", "label": "Group"},
-        {"expected": "Направление подготовки / Subject area:", "label": "Subject Area"},
-        {"expected": "Образовательная программа / Educational program:", "label": "Educational Program"},
-        {"expected": "Язык реализации ОП / Language of the educational program:",
-         "label": "Language of Educational Program"},
-        {"expected": "Квалификация / Degree level:", "label": "Degree Level"},
-        {"expected": "Руководитель ВКР / Thesis supervisor:", "label": "Thesis Supervisor"},
-    ]
-
     texts_to_check_section = [
         {"phrase": "СПИСОК СОКРАЩЕНИЙ И УСЛОВНЫХ ОБОЗНАЧЕНИЙ", "label": "Section1"},
         {"phrase": "ТЕРМИНЫ И ОПРЕДЕЛЕНИЯ", "label": "Section2"},
@@ -127,43 +103,6 @@ def validate_tex(tex_str):
     center_blocks = re.findall(r'\\begin{center}(.*?)\\end{center}', tex_str, re.DOTALL)
     center_content = "\n".join(center_blocks)
     center_content = center_content.replace("\\", " ").replace("\n", " ").replace("  ", " ")
-    # 居中内容检查（逐个单词）
-    for item in texts_to_check_title:
-        label = item["label"]
-        words = item["words"]
-        missing_words = [word for word in words if word not in center_content]
-
-        if missing_words:
-            result.append(ValidationModels.ValidationMessage(
-                "AlignmentError",
-                f"Следующие слова в '{label}' не центрированы:{'，'.join(missing_words)}",
-                "Убедитесь, что все слова находятся в пределах \\begin{center} ... \\end{center}.",
-                " ".join(words)
-            ))
-            stats.error_type_count["AlignmentError"] += 1
-
-    # 检查加粗显示和文本内容
-    for item in texts_to_check_bold:
-        expected_text = item["expected"]
-
-        if expected_text not in tex_str:
-            result.append(ValidationModels.ValidationMessage(
-                "ContentMismatch",
-                f"Канонический текст не найден: '{expected_text}'",
-                f"Убедитесь, что в ваш документ включен следующий текст: '{expected_text}'",
-                expected_text
-            ))
-            stats.error_type_count["ContentMismatch"] += 1
-        else:
-            bold_pattern = r'\\textbf\{' + re.escape(expected_text) + r'\}'
-            if not re.search(bold_pattern, tex_str):
-                result.append(ValidationModels.ValidationMessage(
-                    "BoldError",
-                    f"Текст не жирный: '{expected_text}'",
-                    f"Убедитесь, что '{expected_text}' выделен жирным шрифтом с помощью \\textbf{{}}",
-                    expected_text
-                ))
-                stats.error_type_count["BoldError"] += 1
 
     # 无编号标题
     unnumbered_sections = re.findall(r'\\section\*\{([^}]+)\}', tex_str)
