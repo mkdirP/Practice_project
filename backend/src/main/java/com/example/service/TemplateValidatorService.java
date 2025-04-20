@@ -8,6 +8,8 @@ import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.STJc;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.STOnOff;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
@@ -16,66 +18,16 @@ import java.util.*;
 @Service
 public class TemplateValidatorService {
 
-    private List<String> getBoldTextList() {
-        return Arrays.asList(
-                "Обучающийся / Student:",
-                "Факультет / Faculty:",
-                "Группа / Group:",
-                "Направление подготовки / Subject area:",
-                "Образовательная программа / Educational program:",
-                "Язык реализации ОП / Language of the educational program:",
-                "Квалификация / Degree level:",
-                "Руководитель ВКР / Thesis supervisor:"
-        );
-    }
-
-    private List<String> getTitleTextList() {
-        return Arrays.asList(
-                "Министерство науки и высшего образования Российской Федерации",
-                "ФЕДЕРАЛЬНОЕ ГОСУДАРСТВЕННОЕ АВТОНОМНОЕ ОБРАЗОВАТЕЛЬНОЕ УЧРЕЖДЕНИЕ ВЫСШЕГО ОБРАЗОВАНИЯ",
-                "НАЦИОНАЛЬНЫЙ ИССЛЕДОВАТЕЛЬСКИЙ УНИВЕРСИТЕТ ИТМО ITMO University",
-                "ВЫПУСКНАЯ КВАЛИФИКАЦИОННАЯ РАБОТА",
-                "GRADUATION THESIS",
-                "Разработка интеллектуальной системы управления складом для организаций малого бизнеса"
-        );
-    }
-
     private List<String> getSectionTextList() {
         return Arrays.asList(
                 "СПИСОК СОКРАЩЕНИЙ И УСЛОВНЫХ ОБОЗНАЧЕНИЙ",
                 "ТЕРМИНЫ И ОПРЕДЕЛЕНИЯ",
                 "ВВЕДЕНИЕ",
                 "ЗАКЛЮЧЕНИЕ",
-                "СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ"
+                "СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ",
+                "ПРИЛОЖЕНИЕ"
         );
     }
-
-    private List<Map<String, Object>> textsToCheckTitle = Arrays.asList(
-            new HashMap<String, Object>() {{
-                put("words", Arrays.asList("Министерство", "науки", "и", "высшего", "образования", "Российской", "Федерации"));
-                put("label", "Font1");
-            }},
-            new HashMap<String, Object>() {{
-                put("words", Arrays.asList("ФЕДЕРАЛЬНОЕ", "ГОСУДАРСТВЕННОЕ", "АВТОНОМНОЕ", "ОБРАЗОВАТЕЛЬНОЕ", "УЧРЕЖДЕНИЕ", "ВЫСШЕГО", "ОБРАЗОВАНИЯ"));
-                put("label", "Font2");
-            }},
-            new HashMap<String, Object>() {{
-                put("words", Arrays.asList("НАЦИОНАЛЬНЫЙ", "ИССЛЕДОВАТЕЛЬСКИЙ", "УНИВЕРСИТЕТ", "ИТМО", "ITMO", "University"));
-                put("label", "Font3");
-            }},
-            new HashMap<String, Object>() {{
-                put("words", Arrays.asList("ВЫПУСКНАЯ", "КВАЛИФИКАЦИОННАЯ", "РАБОТА"));
-                put("label", "Title1");
-            }},
-            new HashMap<String, Object>() {{
-                put("words", Arrays.asList("GRADUATION", "THESIS"));
-                put("label", "Title2");
-            }},
-            new HashMap<String, Object>() {{
-                put("words", Arrays.asList("Разработка", "интеллектуальной", "системы", "управления", "складом", "для", "организаций", "малого", "бизнеса"));
-                put("label", "Subtitle");
-            }}
-    );
 
 
     List<ValidationMessage> result = new ArrayList<>();
@@ -113,25 +65,11 @@ public class TemplateValidatorService {
 
                 checkFont(paragraph, paragraphText, result, errorCountMap, reportedFontErrors);
                 checkFontSize(paragraph, paragraphText, result, errorCountMap, reportedFontSizeErrors);
-                checkBoldText(getBoldTextList(), paragraph, paragraphText, result, errorCountMap, reportedBoldErrors);
-                checkBoldText(getSectionTextList(), paragraph, paragraphText, result, errorCountMap, reportedBoldErrors);
+                checkBoldText(doc, getSectionTextList(), paragraph, paragraphText, result, errorCountMap, reportedBoldErrors);
 
 
-                // 只检查 textsToCheckTitle 中的文本
-                for (Map<String, Object> entry : textsToCheckTitle) {
-                    List<String> wordsToCheck = (List<String>) entry.get("words");
-
-                    if (containsAllWords(paragraphText, wordsToCheck)) {
-                        checkAlignment(paragraph, paragraphText, result, errorCountMap, reportedAlignmentErrors);
-                    }
-                }
             }
-            checkIsExitInDocument(allParagraphText.toString(), getBoldTextList(), reportedBoldErrors);
-            checkIsExitInDocument(allParagraphText.toString(), getTitleTextList(), reportedBoldErrors);
             checkIsExitInDocument(allParagraphText.toString(), getSectionTextList(), reportedBoldErrors);
-
-            // 目录验证
-            isTOCOnNewPage(doc);
 
             // 统计结果
             ValidationStats stats = new ValidationStats();
@@ -151,56 +89,6 @@ public class TemplateValidatorService {
 
             return new ValidationResponse(result, stats);
 
-        }
-    }
-
-    // 检查段落是否包含所有指定的单词
-    private boolean containsAllWords(String paragraphText, List<String> words) {
-        for (String word : words) {
-            if (!paragraphText.contains(word)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    // 检查文档是否包含目录 -- 难搞
-    private void containsTableOfContents(XWPFDocument doc) {
-
-        boolean foundTOC = false;
-        for (XWPFParagraph paragraph : doc.getParagraphs()) {
-            if (paragraph.getText().contains("СОДЕРЖАНИЕ")) {
-                foundTOC = true;
-                break;
-            }
-        }
-        if (!foundTOC) {
-            result.add(new ValidationMessage(
-                    "MissingTOC",
-                    "Не найдено допустимой команды каталога.",
-                    "文档中必须包含目录",
-                    ""
-            ));
-            errorCountMap.merge("MissingTOC", 1L, Long::sum);
-        }
-    }
-
-
-    // 检查目录是否放在新的一页 -- 难搞
-    private void isTOCOnNewPage(XWPFDocument doc) {
-        for (XWPFParagraph paragraph : doc.getParagraphs()) {
-            if (paragraph.getText().contains("\\tableofcontents")) {
-                // 确保目录前后有新页标记
-                if (paragraph.getAlignment() != ParagraphAlignment.CENTER) {
-                    result.add(new ValidationMessage(
-                            "TOCNotOnNewPage",
-                            "目录没有放在新的一页上",
-                            "请确保目录放在新的一页上。",
-                            ""
-                    ));
-                    errorCountMap.merge("TOCNotOnNewPage", 1L, Long::sum);
-                }
-            }
         }
     }
 
@@ -263,24 +151,13 @@ public class TemplateValidatorService {
         }
     }
     // 检查文本是否加粗和是否左对齐
-    private void checkBoldText( List<String> list, XWPFParagraph paragraph, String paragraphText, List<ValidationMessage> result, Map<String, Long> errorCountMap, Set<String> reportedBoldErrors) {
+    private void checkBoldText(XWPFDocument doc, List<String> list, XWPFParagraph paragraph, String paragraphText, List<ValidationMessage> result, Map<String, Long> errorCountMap, Set<String> reportedBoldErrors) {
 
         for (String expectedBoldText : list) {
             if (paragraphText.contains(expectedBoldText)) {
-                boolean isBold = false;
                 StringBuilder boldText = new StringBuilder();
 
-                // 遍历段落中的每个 XWPFRun 检查是否有加粗的文本
-                for (XWPFRun run : paragraph.getRuns()) {
-                    if (run.isBold()) {
-                        boldText.append(run.text());  // 拼接所有加粗文本
-                        System.out.println("加粗文本: " + boldText);
-                        isBold = true;
-                    }
-                }
-                // if (isBold) {
-                //     System.out.println("加粗文本: " + boldText.toString());
-                // }
+                boolean isBold = isParagraphBold(paragraph, doc);
 
                 // 如果包含了文本，但未加粗，返回错误
                 if (!isBold) {
@@ -296,8 +173,10 @@ public class TemplateValidatorService {
                         reportedBoldErrors.add(errorKey);
                     }
                 }
+
                 // 检查段落是否是左对齐
-                if (paragraph.getAlignment() != ParagraphAlignment.LEFT) {
+                ParagraphAlignment effectiveAlign = getEffectiveAlignment(paragraph, doc);
+                if (effectiveAlign != ParagraphAlignment.LEFT) {
                     String alignmentErrorKey = "AlignmentError:" + expectedBoldText + ":" + paragraphText;
                     if (!reportedBoldErrors.contains(alignmentErrorKey)) {
                         result.add(new ValidationMessage(
@@ -316,22 +195,71 @@ public class TemplateValidatorService {
     }
 
 
+    private boolean isStyleBold(XWPFStyle style) {
+        if (style != null && style.getCTStyle().getRPr() != null && style.getCTStyle().getRPr().getB() != null) {
+            STOnOff.Enum boldVal = style.getCTStyle().getRPr().getB().getVal();
+            return boldVal == STOnOff.TRUE || boldVal == null;
+        }
+        return false;
+    }
 
 
-    // 检查段落是否居中对齐
-    private void checkAlignment(XWPFParagraph paragraph, String paragraphText, List<ValidationMessage> result, Map<String, Long> errorCountMap, Set<String> reportedAlignmentErrors) {
-        if (paragraph.getAlignment() != ParagraphAlignment.CENTER) {
-            String errorKey = "AlignmentError:" + paragraphText;
-            if (!reportedAlignmentErrors.contains(errorKey)) {
-                result.add(new ValidationMessage(
-                        "AlignmentError",
-                        "Текст не отцентрирован",
-                        "Пожалуйста, убедитесь, что текст расположен по центру.",
-                        paragraphText
-                ));
-                errorCountMap.merge("AlignmentError", 1L, Long::sum);
-                reportedAlignmentErrors.add(errorKey);
+
+
+
+    private boolean isParagraphBold(XWPFParagraph paragraph, XWPFDocument document) {
+        boolean hasRun = false;
+        boolean hasAnyBoldRun = false;
+
+        for (XWPFRun run : paragraph.getRuns()) {
+            hasRun = true;
+            if (run.getCTR() != null && run.getCTR().getRPr() != null && run.getCTR().getRPr().isSetB()) {
+                STOnOff.Enum val = run.getCTR().getRPr().getB().getVal();
+                if (val == STOnOff.FALSE) {
+                    return false; // 明确取消加粗，优先级最高
+                } else {
+                    hasAnyBoldRun = true;
+                }
             }
         }
+
+        // 所有 run 都没设置，检查样式
+        if (!hasRun || !hasAnyBoldRun) {
+            String styleId = paragraph.getStyle();
+            if (styleId != null) {
+                XWPFStyle style = document.getStyles().getStyle(styleId);
+                return isStyleBold(style);
+            }
+            return false;
+        }
+
+        return true;
     }
+
+
+
+    private ParagraphAlignment getEffectiveAlignment(XWPFParagraph paragraph, XWPFDocument doc) {
+        // 如果段落本身有设置，直接返回
+        if (paragraph.getAlignment() != ParagraphAlignment.LEFT || paragraph.getCTP().getPPr().isSetJc()) {
+            return paragraph.getAlignment();
+        }
+
+        // 获取段落的样式 ID
+        String styleId = paragraph.getStyle();
+        if (styleId != null) {
+            XWPFStyles styles = doc.getStyles();
+            XWPFStyle style = styles.getStyle(styleId);
+            if (style != null && style.getCTStyle().getPPr() != null && style.getCTStyle().getPPr().isSetJc()) {
+                STJc.Enum jcVal = style.getCTStyle().getPPr().getJc().getVal();
+                return ParagraphAlignment.valueOf(jcVal.toString().toUpperCase());
+            }
+        }
+
+        // 默认返回左对齐
+        return ParagraphAlignment.LEFT;
+    }
+
+
+
+
 }
