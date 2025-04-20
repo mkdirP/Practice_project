@@ -9,14 +9,15 @@
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.myjavafx.controller.UploadController" spacing="30" alignment="CENTER" >
 
-    <Label text="📁 上传 .docx 或 .tex 文件" style="-fx-font-size: 20px;"/>
+    <Label text="📁 Загрузите файл .docx или .tex" style="-fx-font-size: 20px;"/>
 
-    <Label fx:id="fileNameLabel" text="未选择文件" />
+    <Label fx:id="fileNameLabel" text="Файл не выбран" />
 
     <HBox spacing="15" alignment="CENTER">
-        <Button text="选择文件" onAction="#handleFileChoose" prefWidth="160" prefHeight="40"/>
+        <Button text="Выбрать файл" onAction="#handleFileChoose" prefWidth="180" prefHeight="40"/>
         <!--<Button text="重新上传" onAction="#handleReupload"/>-->
-        <Button text="删除文件" onAction="#handleDelete" prefWidth="160" prefHeight="40" styleClass="button-delete"/>
+        <Button text="Удалить файла" onAction="#handleDelete" prefWidth="180" prefHeight="40"
+                styleClass="button-delete"/>
     </HBox>
 
     <ProgressBar fx:id="progressBar" prefWidth="300" visible="false"/>

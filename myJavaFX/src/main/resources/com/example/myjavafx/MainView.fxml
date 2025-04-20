@@ -12,9 +12,9 @@
   <left>
     <VBox alignment="TOP_CENTER" styleClass="left-pane" prefWidth="200">
 
-      <Button text="📁 上传文件" onAction="#showUpload" maxWidth="Infinity" prefHeight="70" />
-      <Button text="📋 查看报告" onAction="#showReport" maxWidth="Infinity" prefHeight="70" />
-      <Button text="📊 查看统计" onAction="#showStats" maxWidth="Infinity" prefHeight="70" />
+      <Button text="📁 Файл" onAction="#showUpload" maxWidth="Infinity" prefHeight="70" />
+      <Button text="📋 Отчет" onAction="#showReport" maxWidth="Infinity" prefHeight="70" />
+      <Button text="📊 Статистика" onAction="#showStats" maxWidth="Infinity" prefHeight="70" />
     </VBox>
   </left>
 

@@ -8,7 +8,7 @@
       fx:controller="com.example.myjavafx.controller.StatsController" spacing="20"
       style="-fx-padding: 20; -fx-background-color: #ECF0F1;">
 
-    <Label text="错误类型统计" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #34495E; -fx-margin-bottom: 20px;"/>
+    <Label text="Статистика типов ошибок" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #34495E; -fx-margin-bottom: 20px;"/>
 
     <HBox alignment="CENTER" >
         <PieChart fx:id="pieChart"/>

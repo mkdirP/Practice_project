@@ -30,9 +30,9 @@ public class UploadController {
         // 从 DataStore 中恢复文件名
         String savedFileName = DataStore.getInstance().getUploadedFileName();
         if (savedFileName != null && !savedFileName.isEmpty()) {
-            fileNameLabel.setText("选中文件: " + savedFileName);
+            fileNameLabel.setText("Выбрать файл: " + savedFileName);
         } else {
-            fileNameLabel.setText("未选择文件");
+            fileNameLabel.setText("Файл не выбран");
         }
         statusLabel.setText("");
     }
@@ -40,15 +40,15 @@ public class UploadController {
     @FXML
     public void handleFileChoose() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("选择文档文件");
+        fileChooser.setTitle("Выберите файл документа");
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("文档文件", "*.docx", "*.tex")
+                new FileChooser.ExtensionFilter("Файлы документации", "*.docx", "*.tex")
         );
         File file = fileChooser.showOpenDialog(null);
 
         if (file != null) {
             currentFile = file;
-            fileNameLabel.setText("选中文件: " + file.getName());
+            fileNameLabel.setText("Выбрать файл: " + file.getName());
             DataStore.getInstance().setUploadedFileName(file.getName());  // 保存文件名到 DataStore
             uploadFile(file);
         }
@@ -59,15 +59,15 @@ public class UploadController {
         if (currentFile != null) {
             uploadFile(currentFile);
         } else {
-            statusLabel.setText("⚠️ 请先选择文件");
+            statusLabel.setText("⚠️ Сначала выберите файл.");
         }
     }
 
     @FXML
     public void handleDelete() {
         currentFile = null;
-        fileNameLabel.setText("未选择文件");
-        statusLabel.setText("✅ 已清除当前状态");
+        fileNameLabel.setText("Файл не выбран");
+        statusLabel.setText("✅ Текущее состояние очищено");
 
         // 清除 DataStore 中的数据
         DataStore.getInstance().setJsonData(null);
@@ -79,16 +79,16 @@ public class UploadController {
         String name = file.getName().toLowerCase();
         boolean allowedType = ALLOWED_EXT.stream().anyMatch(name::endsWith);
         if (!allowedType) {
-            statusLabel.setText("❌ 不支持的文件类型！");
+            statusLabel.setText("❌ Неподдерживаемый тип файла！");
             return;
         }
         if (file.length() > MAX_FILE_SIZE) {
-            statusLabel.setText("❌ 文件超过最大限制 (10MB)");
+            statusLabel.setText("❌ Файл превышает максимальный размер (10MB)");
             return;
         }
 
         progressBar.setVisible(true);
-        statusLabel.setText("⌛ 正在上传...");
+        statusLabel.setText("⌛ Загрузка...");
         disableButtons(true);
 
         Task<Void> uploadTask = new Task<>() {
@@ -103,7 +103,7 @@ public class UploadController {
             protected void succeeded() {
                 progressBar.setVisible(false);
                 disableButtons(false);
-                statusLabel.setText("✅ 上传成功！");
+                statusLabel.setText("✅ Загрузка прошла успешно！");
                 notifyOtherModules();
             }
 
@@ -111,7 +111,7 @@ public class UploadController {
             protected void failed() {
                 progressBar.setVisible(false);
                 disableButtons(false);
-                statusLabel.setText("❌ 上传失败：" + getException().getMessage());
+                statusLabel.setText("❌ Загрузка не удалась：" + getException().getMessage());
             }
         };
 

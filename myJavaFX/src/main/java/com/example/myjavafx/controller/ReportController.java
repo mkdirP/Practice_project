@@ -56,11 +56,11 @@ public class ReportController {
             PDFExporter.exportErrorsToPDF(tableView.getItems());
 
             // 更新导出状态信息
-            exportStatusLabel.setText("报告已成功导出为 PDF 文件！");
+            exportStatusLabel.setText("Отчет успешно экспортирован в PDF-файл!");
             exportStatusLabel.setStyle("-fx-text-fill: #4A4A4A;");
         } catch (Exception e) {
             // 更新导出状态信息
-            exportStatusLabel.setText("导出 PDF 时出现错误: " + e.getMessage());
+            exportStatusLabel.setText("Ошибка при экспорте PDF: " + e.getMessage());
             exportStatusLabel.setStyle("-fx-text-fill: red;");
         }
     }

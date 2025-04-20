@@ -9,21 +9,21 @@
       stylesheets="@style.css">
 
     <!-- 报告标题 -->
-    <Label text="检查报告" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #34495E; -fx-margin-bottom: 20px;"/>
+    <Label text="Отчет о проверке" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #34495E; -fx-margin-bottom: 20px;"/>
 
     <!-- 错误信息表格 -->
     <TableView fx:id="tableView" prefHeight="400" style="-fx-font-size: 14px; -fx-border-color: #BDC3C7;">
         <columns>
-            <TableColumn fx:id="codeColumn" text="错误代码" prefWidth="120"/>
-            <TableColumn fx:id="messageColumn" text="错误信息" prefWidth="250"/>
-            <TableColumn fx:id="suggestionColumn" text="建议" prefWidth="250"/>
-            <TableColumn fx:id="contentColumn" text="内容片段" prefWidth="250"/>
+            <TableColumn fx:id="codeColumn" text="Код ошибки" prefWidth="120"/>
+            <TableColumn fx:id="messageColumn" text="Сообщение об ошибке" prefWidth="250"/>
+            <TableColumn fx:id="suggestionColumn" text="Предположение" prefWidth="250"/>
+            <TableColumn fx:id="contentColumn" text="Фрагменты контента" prefWidth="250"/>
         </columns>
     </TableView>
 
     <!-- 导出按钮 -->
     <HBox alignment="CENTER" >
-        <Button text="📄 导出为 PDF" onAction="#exportPdf" />
+        <Button text="📄 Экспорт в PDF" onAction="#exportPdf" />
     </HBox>
     <HBox alignment="CENTER">
         <Label fx:id="exportStatusLabel" text=""/>

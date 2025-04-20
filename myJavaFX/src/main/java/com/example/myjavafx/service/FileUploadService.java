@@ -17,7 +17,7 @@ public class FileUploadService {
     private static final String LATEX_UPLOAD_URL = "http://localhost:5000/api/validate/latex";
 
     public static JsonNode uploadAndParse(File file) throws IOException, InterruptedException {
-        System.out.println("上传文件: " + file.getAbsolutePath());
+        System.out.println("Загрузить файлы: " + file.getAbsolutePath());
 
         // 根据文件类型选择合适的 URL
         String uploadUrl = getUploadUrl(file);
@@ -33,8 +33,8 @@ public class FileUploadService {
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        System.out.println("响应状态码: " + response.statusCode());
-        System.out.println("响应内容: " + response.body());
+        System.out.println("Код статуса ответа: " + response.statusCode());
+        System.out.println("Содержание ответа: " + response.body());
 
         return com.fasterxml.jackson.databind.json.JsonMapper.builder()
                 .findAndAddModules()
@@ -46,9 +46,9 @@ public class FileUploadService {
         // 根据文件扩展名返回对应的 URL
         String fileName = file.getName().toLowerCase();
         if (fileName.endsWith(".tex")) {
-            return LATEX_UPLOAD_URL;  // 如果是 .tex 文件，返回 LaTeX 的 URL
+            return LATEX_UPLOAD_URL;
         }
-        return DOCX_UPLOAD_URL;  // 否则默认发送到 .docx 的 URL
+        return DOCX_UPLOAD_URL;
     }
 
     private static HttpRequest.BodyPublisher buildMultipartFormData(File file, String boundary) throws IOException {
